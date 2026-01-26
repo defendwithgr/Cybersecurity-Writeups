@@ -1,0 +1,939 @@
+**Room Difficulty:** Easy  
+**Time Required:** ~30 minutes  
+**Target Machine:** adbasics_v1.2--badr  
+**Target IP:** 10.80.154.26
+
+## Table of Contents
+- [Introduction](#task-1-introduction)
+- [Windows Domains](#task-2-windows-domains)
+- [Active Directory](#task-3-active-directory)
+- [Managing Users in AD](#task-4-managing-users-in-ad)
+- [Managing Computers in AD](#task-5-managing-computers-in-ad)
+- [Group Policies](#task-6-group-policies)
+- [Authentication Methods](#task-7-authentication-methods)
+- [Trees, Forests and Trusts](#task-8-trees-forests-and-trusts)
+- [Conclusion](#task-9-conclusion)
+
+---
+
+## Task 1: Introduction
+
+### What's This Room About?
+
+So you've decided to dive into Active Directory (AD) – great choice! If you've ever wondered how big companies manage thousands of users, computers, and devices without complete chaos, the answer is usually: **Active Directory**.
+
+Think of AD as the control center of a corporate Windows network. Instead of manually configuring every single machine, AD lets you manage everything from one central location. Pretty neat, right?
+
+### What You'll Learn Here
+
+By the end of this room, you'll understand:
+- What Active Directory actually is (and why companies can't live without it)
+- How Windows domains work
+- How to organize users and computers
+- How to set security policies for entire groups of machines
+- Authentication methods (the boring but important stuff)
+- How large organizations structure their AD with multiple domains
+
+### What You Should Already Know
+
+You don't need to be an expert, but having a basic understanding of Windows will help. If you're rusty on Windows basics, no worries – check out the Windows Fundamentals module first.
+
+---
+
+## Task 2: Windows Domains – Why You Need Them
+
+### The "Growing Pains" Scenario
+
+Let's say you're the IT person for a small business. Five computers, five employees – totally manageable, right? You can:
+- Walk to each desk and manually create user accounts
+- Configure each computer individually
+- Deal with each problem on a case-by-case basis
+
+This works for a while. You're fine. Everything is fine. 🔥
+
+Then... the company grows. 📈
+
+Now you've got **157 computers across 4 offices and 320 different employees**. You can't possibly:
+- Remember every user's password
+- Manually configure policies for each machine
+- Troubleshoot problems at multiple sites
+- Manage who can access what resources
+
+**This is where Windows Domains come in.**
+
+### What Even Is a "Windows Domain"?
+
+A **Windows domain** is basically a group of users and computers that you manage as one unit. Instead of dealing with each machine individually, you have one central place where everything is controlled.
+
+The machine that runs this central control? It's called a **Domain Controller (DC)**. It holds all the information about users, computers, and settings.
+
+### The Real Benefits
+
+Here's why companies use domains instead of just doing things locally:
+- **One place to manage everything** – Change a password rule? It applies to all 157 computers at once
+- **Consistency** – Everyone gets the same security settings, updates, and configurations
+- **Resource sharing** – Users can access shared files and printers without extra setup
+- **Scale without breaking** – Works just as well for 50 computers as it does for 5,000
+
+---
+
+## Task 3: Active Directory – The Brain of the System
+
+### What's Actually in Active Directory?
+
+Active Directory Domain Service (AD DS) is basically a **database of everything** in your domain. It holds information about:
+- Users (real people and service accounts)
+- Computers/Servers
+- Printers
+- File shares
+- Groups
+- Security settings
+- ...and a bunch of other stuff
+
+Think of it as a massive contact book, but instead of just names and phone numbers, it tracks every device and person in your organization.
+
+### Understanding Users (And No, Not Just People)
+
+#### Users as Security Principals
+
+When we talk about "users" in AD, we're talking about something called a **security principal**. Fancy term, but it just means: "something that can be authenticated and given permissions."
+
+Users can represent two different things:
+
+**1. Actual People** 👤  
+Regular employees who log in and do their work. They need to access files, printers, email servers, etc.
+
+**2. Services** 🤖  
+Sometimes you need a user account for software to run under. For example, a web server or database might need its own user account that only has the permissions it needs to function (not admin access to everything).
+
+#### What Makes Users Special?
+
+When you create a user in AD, that user can:
+- Log into machines in the domain
+- Access files and resources they're authorized for
+- Have their permissions centrally managed
+- Be secured with domain-wide password policies
+
+### Computers in Active Directory
+
+Computers can also be objects in AD. When a computer joins the domain, it gets its own **machine account** (kind of like a user account, but for the computer itself).
+
+This is important because:
+- The DC knows which machines are part of the domain
+- You can apply different security settings to different computers
+- You can remotely manage software and updates
+- The computer can authenticate with the DC
+
+### Keeping Things Organized with OUs
+
+If AD is like a huge contact book, **Organizational Units (OUs)** are like the tabs in that contact book. You use them to organize users and computers by:
+- Department (Sales, Marketing, IT)
+- Location (Office in Toronto, New York, London)
+- Function (Servers, Workstations, Domain Controllers)
+
+This makes management WAY easier because you can apply settings to a whole group instead of individually.
+
+---
+
+## Task 4: Managing Users in AD – Your First Real Task
+
+### Your New Job: Organize the Chaos
+
+You've just been hired as a domain admin. Your first task? The business has changed, and the AD structure is a mess. You've been given this org chart:
+
+text
+                MANAGEMENT
+                    |
+    ________________|________________
+    |               |               |
+MARKETING          SALES             IT
+ (users)          (users)           (users)
+text
+
+Your job: **Make AD match this chart.**
+
+### The Dirty Job: Deleting Old Stuff
+
+First thing you'll notice? There's an extra department OU hanging around that isn't on the chart. Turns out it was closed, and you need to delete it.
+
+You right-click it, hit delete, and... **ERROR:**
+
+"You do not have sufficient privileges to delete [OU],
+protected from accidental deletion."
+
+text
+
+### How to Actually Delete It
+
+AD protects OUs from accidental deletion because, you know, accidentally nuking a whole department would be bad. Here's how to override that:
+
+1. **Right-click the OU** → **Properties**
+2. Go to the **Object** tab
+3. **Uncheck** the box that says "Protect object from accidental deletion"
+4. Click **OK**
+5. Now you can delete it! 🎉
+
+### Creating the Users You Need
+
+Once your OUs are cleaned up, you'll create users in the appropriate departments:
+- Marketing people go in the Marketing OU
+- Sales folks go in the Sales OU
+- IT team goes in the IT OU
+
+This organization becomes super important later when we talk about **Group Policies** – because you'll be able to say "apply this setting to everyone in Marketing" with one click.
+
+---
+
+## Task 5: Managing Computers in AD – Organizing Your Hardware
+
+### The Default Problem
+
+When machines join the domain, Windows throws them all in a container called "Computers" by default. It's like everyone's shoes going into one huge pile – technically organized, but not really helpful.
+
+Looking at your current setup, you've got a mix of:
+- Servers (SRV-OBDS01, etc.)
+- Laptops (LPT-SOPHIE, LPT-THOMAS, etc.)
+- Desktop PCs (PC-CLAIRE, PC-DANIEL, etc.)
+- And they're all just... in one folder
+
+### Why You Need to Organize
+
+Different types of computers need different settings. A server shouldn't have the same policies as a user's laptop. A user's laptop shouldn't have the same security requirements as a domain controller.
+
+### The Three Main Categories
+
+Here's a good starting framework:
+
+**1. Workstations**  
+These are the regular computers employees use day-to-day. Laptops, desktops at their desks, that sort of thing. They need decent security, automatic updates, and reasonable performance.
+
+**2. Servers**  
+The heavy lifters of your network. File servers, print servers, email servers – machines that provide services to everyone else. They need extra security, specific monitoring, and controlled updates (can't just reboot whenever).
+
+**3. Domain Controllers**  
+The VIPs. These run AD itself. They need the most security, careful management, and redundancy (usually multiple DCs for failover).
+
+### What You Get from Organizing
+
+Once you split them up into different OUs, you can:
+- Apply different security policies to each group
+- Manage software differently (servers get updated carefully, workstations can update more aggressively)
+- Control access to resources based on machine type
+- Make troubleshooting easier (you know where to look)
+
+---
+
+## Task 6: Group Policies – Where the Real Power Is
+
+### Here's the Thing About OUs...
+
+We've spent a lot of time organizing users and computers into different OUs. But just having them organized doesn't actually *do* anything yet. They're just... grouped.
+
+**Group Policies** are what actually make the grouping useful. This is where you say: "Okay, everyone in this OU, here are the rules you're going to follow."
+
+### What's a Group Policy, Anyway?
+
+A **Group Policy Object (GPO)** is just a collection of settings. Think of it like a rulebook. You can have rules for:
+- Passwords (minimum length, complexity, expiration)
+- Security settings (firewall, encryption, access controls)
+- Software (what gets installed, what gets updated)
+- User experience (what shows on the desktop, what they can access)
+
+And here's the cool part: one GPO can apply to hundreds or thousands of machines at once.
+
+### How to Access This Stuff
+
+You'll need **Group Policy Management**. Here's how to find it:
+1. Hit the **Windows key**
+2. Type: **"Group Policy Management"**
+3. Click the desktop app that appears
+4. Boom, you're in
+
+When it opens, you'll see your entire OU structure in a tree view, plus all the GPOs that already exist.
+
+### Your Existing GPOs
+
+The domain probably already has some defaults:
+- **Default Domain Policy** – Applied to the whole domain
+- **RDP Policy** – Controls Remote Desktop settings
+- **Default Domain Controllers Policy** – Special rules just for DCs
+
+### Important Thing to Know: Inheritance
+
+GPOs don't just apply to their direct OU. They apply to that OU **and all child OUs under it**. 
+
+So if you apply a GPO to "Management", it also applies to "Management > Finance", "Management > HR", etc. This is super powerful, but also something to keep in mind so you don't accidentally break things.
+
+### Looking Inside a GPO
+
+When you open a GPO, you'll see tabs like:
+
+**Scope Tab**  
+Shows you where this GPO is linked in your AD structure. Like, "This applies to the domain" or "This applies just to the IT OU."
+
+**Settings Tab**  
+This is where the actual rules are. You'll see two sections:
+- **Computer Configuration** – Rules that apply to machines (everyone's machine will follow these)
+- **User Configuration** – Rules that apply to people (every user account will follow these)
+
+A GPO might have rules for both, or just one, or the other.
+
+### Example: The Default Domain Policy
+
+It typically contains things like:
+- How long passwords need to be
+- How many times you can guess wrong before getting locked out
+- Password complexity rules (upper/lower case, numbers, symbols)
+
+These are pretty basic security stuff that should apply everywhere.
+
+### How GPOs Actually Get to Your Machines
+
+Windows uses a special shared folder called **SYSVOL** (located at `C:\Windows\SYSVOL\sysvol\` on each DC) to distribute GPOs. 
+
+Every computer in the domain periodically checks for new/updated GPOs and downloads them. By default, this happens every 90 minutes or so.
+
+**If you need to force it RIGHT NOW:**
+```powershell
+gpupdate /force
+Run that command and your machine will sync immediately. Handy for testing.
+
+Real-World Example: Securing THM Inc.
+Let's say you work at a company (THM Inc.) and they've asked you to implement two important security policies. This is the kind of stuff you'd actually do in a real job.
+
+Task 1: "Nobody Except IT Should Touch the Control Panel"
+The Request:
+The business wants to make sure only IT people can access the Windows Control Panel on their computers. Regular employees in Marketing, Sales, and Management shouldn't be able to change system settings.
+
+Your Solution:
+
+Create a new GPO called "Restrict Control Panel Access"
+
+Edit it and navigate to:
+User Configuration > Policies > Administrative Templates > Control Panel
+
+Find and enable the policy called "Prohibit Access to Control Panel and PC settings"
+
+Link the GPO to three OUs:
+
+Marketing
+
+Sales
+
+Management
+
+(Drag and drop the GPO onto each OU)
+
+Don't apply it to IT – because they need Control Panel access!
+
+What happens:
+When someone in Marketing tries to open Control Panel, they get a message: "This operation has been denied by the administrator." 🔒
+
+Task 2: "Computers Should Lock After 5 Minutes of Nobody Using Them"
+The Request:
+A security requirement: every workstation and server should automatically lock if someone walks away and doesn't touch it for 5 minutes.
+
+Your Solution:
+
+Create a new GPO called "Auto Lock Screen"
+
+Edit it and navigate to:
+Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > Security Options
+
+Find the "Interactive logon: Machine inactivity limit" policy
+
+Set it to 5 minutes
+
+Link it to the root domain
+
+Why link to the root domain?
+Because it's a Computer Configuration setting, only actual computers will use it. User-only OUs (like Sales, Marketing) will just ignore this part of the GPO, so it's safe to apply broadly.
+
+What happens:
+You walk away from your desk, grab coffee, and when you come back 5 minutes later, your screen is locked. 🔐
+
+Testing Your Work
+You want to verify everything worked? Log in as a test user:
+
+text
+Username: Mark
+Password: M4rk3t1ng.21
+Domain: THM\Mark  (when using RDP)
+Expectations:
+
+When Mark (a Marketing user) tries to open Control Panel → Blocked ✓
+
+When Mark (or anyone) doesn't touch keyboard for 5 min → Screen locks ✓
+
+When GPOs Don't Work (And How to Fix It)
+Sometimes you create a GPO and... nothing happens. The user doesn't see the changes. Common reasons:
+
+You linked it to the wrong OU
+
+The user/computer hasn't rebooted since you made the change
+
+The GPO hasn't synced yet (wait up to 2 hours, or force it)
+
+You applied a Computer Configuration to a user-only OU (won't work)
+
+The nuclear option:
+
+powershell
+gpupdate /force
+Run that on the machine and it will immediately download and apply all GPOs. Problem usually solved.
+
+Task Questions (Answers)
+Q: What is the name of the network share used to distribute GPOs to domain machines?
+A: SYSVOL
+
+Q: Can a GPO be used to apply settings to users and computers?
+A: Yes (yay!)
+
+Task 7: Authentication Methods – How Login Actually Works
+Where Passwords Live in a Domain
+Here's something most people don't think about: when you use your domain credentials to log into a computer at work, that computer doesn't actually know your password.
+
+Sounds crazy, right? But think about it: if every computer stored everyone's password, that would be a security nightmare. Every machine would be a potential password goldmine for hackers.
+
+Instead, here's how it actually works:
+
+The Domain Controller (DC) is the only place that knows your password. When you try to log in, your computer sends a message to the DC: "Hey, this person claims to be Alice. Here's what they typed. Can you check if that's right?"
+
+The DC verifies: "Yep, that's correct" or "Nope, that's wrong."
+
+Your local computer never knows your actual password. Pretty clever, right?
+
+Two Ways to Have This Conversation
+Windows domains support two different protocols for this authentication conversation between your computer and the DC.
+
+1. Kerberos (The Modern, Cool Kid)
+Who uses it: Basically every recent version of Windows (Windows 10, Windows Server 2016+, etc.)
+
+Status: Default protocol for all new Windows domains
+
+The vibe: Modern, secure, efficient. This is what you should use.
+
+2. NetNTLM (The Legacy Old Timer)
+Who uses it: Ancient systems, compatibility mode, weird edge cases
+
+Status: Still enabled on most networks because you never know what old system is going to try to authenticate
+
+The vibe: Older, less secure, slower, but it works with systems from like 1997 (probably)
+
+Real talk: Most organizations have BOTH enabled because maintaining backward compatibility is more important than being "pure." It's messier in the real world. 🤷
+
+Understanding Kerberos – The Ticket System
+The Problem It Solves
+Imagine if every time you accessed something – a file share, a printer, a web application – your computer had to ask the DC: "Is this person allowed?"
+
+That would mean:
+
+Thousands of authentication requests flooding the DC every second
+
+Slow performance (network latency for every action)
+
+DC becoming a bottleneck
+
+Network traffic going crazy
+
+Solution: Instead of proving yourself over and over, you get a ticket. One ticket that proves you already authenticated.
+
+Think of it like this: You go to a concert venue, prove you have a ticket at the entrance, and they give you a wristband. The wristband proves you already got through security. You don't need to show your original ticket to every vendor inside the venue. Just flash the wristband.
+
+That's Kerberos.
+
+How Kerberos Actually Works
+The Flow:
+
+Step 1: You Log In to Your Computer
+
+text
+You: "Hey DC, I'm Alice and my password is SuperSecret123"
+DC: "Yep, that's right. Here's your proof." 
+    (Hands you a special ticket called a TGT)
+Your Computer: "Great! I'll keep this ticket safe."
+Step 2: You Try to Access a File Share
+
+text
+You: "Hey file server, can I access the Sales folder?"
+File Server: "Hmm, let me see... do you have proof?"
+You: "Yes! Here's my ticket."
+File Server: "Nice! I can verify this myself. You're in!"
+Step 3: You Access a Printer
+
+text
+You: "Can I print?"
+Printer: "Proof?"
+You: "Here's my ticket."
+Printer: "Good enough for me!"
+Key thing: The DC doesn't get involved in Steps 2 and 3. The ticket is enough proof. The file server and printer can verify it themselves.
+
+Benefits:
+
+DC isn't getting hammered with requests
+
+Faster for users (no network round trip to DC for every action)
+
+More secure (tickets have expiration times)
+
+Better performance overall
+
+Scales to thousands of users without breaking the DC
+
+The Technical Details (If You Care)
+If you want to understand what's actually happening under the hood:
+
+TGT – Ticket Granting Ticket
+When you log in, the DC gives you a TGT. This is basically:
+
+Proof that you authenticated successfully
+
+Used to get other tickets
+
+Held by your computer (kept safe in a special cache)
+
+Default expiration: 10 hours
+
+Service Tickets
+When you need to access something (file share, printer, app), your TGT is used to get a Service Ticket for that specific service.
+
+text
+Your Computer: "I want to access the printer. Here's my TGT."
+DC: "Okay, here's a service ticket just for the printer."
+Your Computer: "Thanks! Now I'll use this to talk to the printer."
+Each service gets its own ticket. Default expiration: 1 hour.
+
+Why Tickets Expire
+Tickets aren't forever. They expire for a good reason:
+
+Security: If a ticket gets stolen, the attacker has limited time to use it. After expiration, it's worthless.
+
+Resource cleanup: Expired tickets are cleaned up automatically.
+
+Policy enforcement: If someone leaves the company and their account is disabled, their existing tickets will eventually expire and they'll be locked out.
+
+One More Thing About Authentication
+There's actually a third step you don't see:
+
+Step 0: You Physically Log Into Your Computer
+
+Before any of this Kerberos stuff happens, YOU have to log in locally first. You type your password, and Windows verifies it against the DC. Once that's verified, THEN all the Kerberos stuff can happen.
+
+If the DC is unreachable, you can often still log in with cached credentials (your computer remembers your last login). But you won't get a fresh TGT from the DC until the DC is back.
+
+Task 8: Trees, Forests and Trusts – When One Domain Just Isn't Enough
+The Growing Company Problem
+We've been talking about ONE domain the whole time. That works great! Until it doesn't.
+
+Picture this scenario: Your company is growing like crazy. 📈
+
+Year 1: One office, one domain. Easy. Everything is managed from one place.
+
+Year 3: Still one office, but now 5,000 users and 3,000 computers. You're scaling, but still one domain.
+
+Year 5: The company expands INTERNATIONALLY. Now you have offices in:
+
+Toronto, Canada
+
+New York, USA
+
+London, UK
+
+Singapore
+
+Each office has:
+
+Different laws and regulations (GDPR in Europe, different in Asia)
+
+Different IT teams managing their own stuff
+
+Thousands of users
+
+Different business needs and security requirements
+
+The Problem:
+
+If you try to keep it all in ONE domain:
+
+Massive OU structure - You'd have an incredibly deep/complex OU tree that's a nightmare to manage
+
+One set of policies for everyone - But Canada needs different rules than London (legal requirements)
+
+Replication nightmare - All domain data has to sync between Toronto and Singapore (network bandwidth, latency)
+
+Accidental access - People in Singapore can potentially access resources in Canada (security risk)
+
+Single point of failure - One DC in Toronto dies and Singapore can't function
+
+IT teams getting in each other's way - Toronto IT team could accidentally change things in Singapore
+
+The Solution: Multiple domains organized in a structured way! 🎯
+
+Domain Trees – Parent-Child Domains
+A Domain Tree is when you have multiple domains organized in a parent-child relationship where they share a common root.
+
+Example Structure
+text
+thm.local  ← Root domain
+│
+├── canada.thm.local  ← Child domain
+│   ├── toronto.canada.thm.local  ← Grandchild
+│   └── vancouver.canada.thm.local
+│
+├── usa.thm.local  ← Child domain
+│   ├── newyork.usa.thm.local
+│   └── losangeles.usa.thm.local
+│
+└── europe.thm.local  ← Child domain
+    ├── london.europe.thm.local
+    └── paris.europe.thm.local
+This is a tree because:
+
+One root domain (thm.local)
+
+Child domains under it
+
+Domains within domains (grandchildren)
+
+All connected in a hierarchical structure
+
+How Tree Domains Work Together
+Each domain is independent:
+
+Toronto IT manages toronto.canada.thm.local
+
+New York IT manages newyork.usa.thm.local
+
+They don't interfere with each other
+
+But they trust each other automatically:
+
+A user in Toronto can access resources in New York (if they have permission)
+
+They share a common security structure
+
+It's seamless (no extra authentication needed)
+
+Key benefit: Distributed management but unified identity.
+
+Forests – When You Need Completely Separate Trees
+A Forest is when you have multiple trees operating within the same organization.
+
+When Would You Need This?
+Most companies just need one tree. But some need forests:
+
+Scenario 1: Different Business Units
+Your company has 3 divisions:
+
+Product Division (10,000 employees)
+
+Services Division (5,000 employees)
+
+Finance Division (2,000 employees)
+
+Each division might want their own completely separate AD structure:
+
+text
+Forest
+├── Tree 1: products.com
+│   ├── northamerica.products.com
+│   └── europe.products.com
+│
+├── Tree 2: services.com
+│   └── all-services.com
+│
+└── Tree 3: finance.company.com
+    └── all-finance.com
+Scenario 2: Company Acquisition
+Your company acquires another company. They have their own:
+
+Active Directory structure
+
+Security policies
+
+IT infrastructure
+
+Domain controllers
+
+Instead of migrating everyone to your domain (risky and time-consuming), you create a forest relationship:
+
+text
+Forest
+├── Tree 1: ourcompany.local
+│   └── (our original structure)
+│
+└── Tree 2: acquiredcompany.local
+    └── (their original structure)
+Both companies keep their own AD, but they can work together.
+
+Scenario 3: Regulatory/Compliance Isolation
+A bank owns a financial services subsidiary that must be legally separate for regulatory reasons:
+
+text
+Forest
+├── Tree 1: mainbank.local
+└── Tree 2: subsidiary-bank.local (completely separate for legal reasons)
+Visual Example
+text
+       FOREST
+         |
+    _____|_____
+    |         |
+   Tree1     Tree2
+   root1.local  root2.local
+    |         |
+  children  children
+Domain Trusts – The Magic Sauce
+The real magic that makes all this work is something called a trust (or more formally, a trust relationship).
+
+A trust is basically a formal relationship where one domain says: "I trust THIS other domain. If they say someone is legitimate, I believe them."
+
+One-Way Trust
+Let's say Domain A trusts Domain B.
+
+text
+Domain A  ←--trust-- Domain B
+What this means:
+
+Users in Domain B can access resources in Domain A (if granted permission)
+
+Users in Domain A CANNOT access resources in Domain B
+
+Real example:
+
+text
+corporate.local  ←--trust-- subsidiary.local
+
+Users from subsidiary.local can work in corporate.local
+BUT
+Users from corporate.local cannot access subsidiary.local resources
+Two-Way Trust
+When both domains trust each other:
+
+text
+Domain A  ←--trust--→ Domain B
+What this means:
+
+Users in Domain A can access Domain B resources
+
+Users in Domain B can access Domain A resources
+
+Works seamlessly in both directions
+
+Real example:
+
+text
+company1.local  ←--trust--→ company2.local
+
+Employees from company1 can access company2 systems
+Employees from company2 can access company1 systems
+Why This All Matters
+In a large enterprise, you might see:
+
+text
+20+ domains
+4-5 forests
+Dozens of trust relationships
+Thousands of users accessing resources across the entire organization
+Each team managing only their own domain
+Understanding this helps you:
+
+Navigate complex AD environments without getting lost
+
+Plan infrastructure for growing organizations
+
+Understand why your company has the structure it does
+
+Fix cross-domain access issues
+
+Secure cross-domain relationships properly
+
+Real-world impact: Many security breaches happen because someone misconfigured a trust relationship, allowing access that shouldn't exist.
+
+Task 9: Conclusion – You're Now an AD Fundamentals Person! 🎉
+Holy Cow, Look How Much You've Learned
+You started this room not knowing what Active Directory was. Now you understand:
+
+The Basics (Foundation):
+
+✅ What Active Directory actually is – A massive database of everything in your network
+
+✅ Why Windows domains exist – To manage thousands of devices centrally instead of one-by-one
+
+✅ Users and computers – The objects that AD manages
+
+✅ Organizational Units – How you organize everything logically
+
+The Power Stuff (Implementation):
+
+✅ Group Policies – How you actually MAKE THINGS HAPPEN at scale
+
+✅ Creating GPOs – Building your own rulebooks
+
+✅ Linking GPOs – Applying rules to specific groups
+
+✅ Real examples – Blocking Control Panel, auto-locking screens
+
+✅ Troubleshooting – Using gpupdate /force to fix things
+
+The Advanced Concepts (Architecture):
+
+✅ Authentication – How passwords work without computers storing them
+
+✅ Kerberos – The ticket system that scales to thousands of users
+
+✅ Domain Trees – Multiple domains with parent-child relationships
+
+✅ Domain Forests – Multiple trees for complex organizations
+
+✅ Trust relationships – How separate domains work together
+
+That's not trivial stuff. That's real infrastructure knowledge. 💪
+
+Where This Knowledge Actually Applies
+This isn't just theoretical. This stuff is used in EVERY corporate environment:
+
+System Administration
+
+Managing 5,000 employee computers from one place
+
+Rolling out software updates automatically
+
+Ensuring password policies are enforced
+
+Security & Hardening
+
+Locking down machines so users can't break things
+
+Implementing security baselines
+
+Controlling access to sensitive resources
+
+Penetration Testing
+
+Finding AD misconfigurations
+
+Exploiting trust relationships
+
+Escalating privileges
+
+Compliance & Auditing
+
+Proving that policies are enforced
+
+Tracking who accessed what
+
+Meeting regulatory requirements (HIPAA, GDPR, etc.)
+
+IT Operations
+
+Troubleshooting login issues
+
+Managing user access
+
+Planning infrastructure for growth
+
+What to Explore Next
+You've got the foundation. Here's the natural progression:
+
+If You Want to Go DEEPER into AD (Security Focus)
+Check out the Active Directory Hardening Room next. It covers:
+
+Common AD misconfigurations
+
+How to harden AD against attacks
+
+Security best practices
+
+Real-world vulnerabilities
+
+Then move to Compromising Active Directory to learn:
+
+How attackers abuse AD
+
+Kerberoasting attacks
+
+Golden Ticket attacks
+
+Lateral movement techniques
+
+Defense strategies
+
+If You Want to Practice More with AD (Hands-On)
+Keep experimenting in the lab – Create complex OU structures, try different GPOs, break things and fix them
+
+Build a home lab – Set up your own AD environment with VirtualBox
+
+Complete HackTheBox machines – Real-world Windows/AD scenarios
+
+If You Want to Understand Windows Better
+Windows Privilege Escalation room – How to escalate from user to admin
+
+Windows Network Security – How networks communicate securely
+
+Active Directory Certificate Services – Advanced AD features
+
+The Real Talk: This Is Just the Beginning
+Here's something important: This room gives you the basics. Real-world Active Directory is:
+
+WAY more complex
+
+Full of weird legacy configurations
+
+Sometimes poorly designed by previous adm
+
+ask 7: Authentication Methods
+Question 1
+Q: Will a current version of Windows use NetNTLM as the preferred authentication protocol by default? (yay/nay)
+
+A: nay
+
+Question 2
+Q: When referring to Kerberos, what type of ticket allows us to request further tickets known as TGS?
+
+A: Ticket Granting Ticket
+
+Question 3
+Q: When using NetNTLM, is a user's password transmitted over the network at any point? (yay/nay)
+
+A: nay
+
+Task 8: Trees, Forests and Trusts
+Question 1
+Q: What is a group of Windows domains that share the same namespace called?
+
+A: Tree
+
+Question 2
+Q: What must be established between two domains for a user in Domain A to access a resource in Domain B?
+
+A: A Trust Relationship
+
+Task 9: Conclusion
+No answer-based questions. This task is for feedback and reflection on the room. It asks: "How likely are you to recommend this room to others?" with a rating scale from 1-10. This is optional feedback, not a required answer.
+
+Summary of All Answers
+Task	Question	Answer
+7	Will Windows use NetNTLM by default?	nay
+7	What ticket allows us to request TGS?	Ticket Granting Ticket
+7	Is password transmitted in NetNTLM?	nay
+8	What is a group of domains sharing the same namespace?	Tree
+8	What must be established between two domains for access?	A Trust Relationship
+9	Rating question	(Optional - 1-10 rating)
+Key Concepts to Remember
+Task 7 - Authentication:
+
+Kerberos is the modern default (not NetNTLM)
+
+TGT (Ticket Granting Ticket) is used to request TGS (Ticket Granting Service)
+
+Neither protocol transmits passwords over the network
+
+Task 8 - Domain Structure:
+
+Tree: Multiple domains sharing the same namespace (like canada.thm.local, usa.thm.local)
+
+Trust Relationship: Formal connection between domains allowing cross-domain access
+
+Without a trust, users from one domain cannot access resources in another
+
