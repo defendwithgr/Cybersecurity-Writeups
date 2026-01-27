@@ -1,0 +1,232 @@
+This medium-difficulty room focuses on securing Active Directory environments through practical defense techniques. It covers authentication hardening, least privilege implementation, Group Policy configuration, and protection against common AD attacks.
+​
+
+Room Details:
+
+Difficulty: Medium
+
+Duration: ~240 minutes
+
+Machine: Windows Server 2019
+
+Prerequisites
+Before attempting this room, complete:
+
+Active Directory Basics
+
+Breaching Active Directory
+
+The Lay of the Land
+
+Initial Setup
+Connection Credentials:
+
+IP: MACHINE_IP
+
+Username: Administrator
+
+Password: tryhackmewouldnotguess1@
+
+Connect via RDP or use the split-screen browser interface.
+
+Task 2: Understanding General AD Concepts
+This task reviews fundamental AD structure and components.
+
+Question: What is the root domain in the attached AD machine?
+
+Solution:
+
+Open Server Manager
+
+Navigate to Tools → Active Directory Domains and Trusts
+
+Observe the domain structure
+
+Answer: tryhackme.loc
+​
+
+Task 3: Securing Authentication Methods
+This section addresses authentication vulnerabilities including LM hash storage, SMB signing, and LDAP security.
+
+Disabling LM Hash Storage
+Question: Change the Group Policy Setting so it does not store the LAN Manager hash on the next password change.
+
+Solution:
+
+Open Group Policy Management (gpmc.msc)
+
+Navigate to: Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies → Security Options
+
+Locate "Network security: Do not store LAN Manager hash value on next password change"
+
+Enable this policy
+​
+
+Password Policy Configuration
+Question: What is the default minimum password length?
+
+Solution:
+
+Group Policy Management → Default Domain Policy → Edit
+
+Navigate to: Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies → Password Policy
+
+Check "Minimum password length" setting
+​
+
+Answer: 7 characters
+​
+
+SMB and LDAP Signing
+Configure signing requirements to prevent relay attacks:
+
+SMB Signing: Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies → Security Options → "Microsoft network client: Digitally sign communications (always)" → Enable
+
+LDAP Signing: Domain controller: LDAP server signing requirements → Select "Require signing"
+​
+​
+
+Task 4: Implementing Least Privilege Model
+The principle of least privilege limits access rights to minimum necessary permissions.
+
+Tiering Model
+Active Directory uses a three-tier administrative model:
+
+Tier 0: Domain Controllers, domain admins, enterprise admins
+
+Tier 1: Application servers, member servers
+
+Tier 2: Workstations, user accounts
+
+Question 1: Computers and Printers must be added to Tier 0 – yea/nay?
+
+Answer: nay
+​
+
+Rationale: Only critical AD infrastructure belongs in Tier 0. Standard computers and printers are Tier 2 assets.
+
+Question 2: Suppose a vendor arrives for a 2-week task. Should you create a high privilege account?
+
+Answer: nay
+​
+
+Rationale: Temporary vendors require time-limited accounts with minimal permissions. Use Just-In-Time (JIT) access if elevated privileges are needed.
+
+Best Practices
+Regular access reviews and audits
+
+Time-limited privileged accounts
+
+Separation of duties
+
+No shared accounts
+
+Task 5: Microsoft Security Compliance Toolkit
+Microsoft provides pre-configured security baselines for enterprise environments.
+
+Installation Steps
+Download Microsoft Security Compliance Toolkit
+
+Extract to accessible directory
+
+Navigate to Scripts folder
+
+Execute PowerShell script to apply baseline
+
+Policy Analyzer
+The toolkit includes Policy Analyzer for comparing current configurations against security baselines.
+
+Question: Locate merge policy rules in Policy Analyzer folder.
+
+Solution:
+
+Open Policy Analyzer tool
+
+Navigate to relevant policy folder
+
+Open merge policy file in text editor or PowerShell ISE
+
+Review policy differences and recommendations
+​
+
+This tool identifies configuration gaps and redundant policies across GPOs.
+
+Task 6: Protecting Against Known Attacks
+Common AD Attack Vectors
+Pass-the-Hash (PtH):
+
+Defense: Disable LM/NTLM where possible, implement Credential Guard, use Protected Users security group
+
+Kerberoasting:
+
+Defense: Strong service account passwords (25+ characters), regular password rotation, least privilege service accounts
+
+Golden/Silver Ticket:
+
+Defense: Secure KRBTGT account, regular password resets (twice), monitor TGT requests
+
+DCSync:
+
+Defense: Restrict replication permissions, monitor DCSync activity, segment admin accounts
+
+LLMNR/NBT-NS Poisoning:
+
+Defense: Disable LLMNR and NetBIOS via GPO, implement SMB signing
+​
+
+Monitoring and Detection
+Enable audit logging for:
+
+Account logon events
+
+Privilege escalation attempts
+
+Group membership changes
+
+Service account activity
+
+Use SIEM tools (Splunk, Microsoft Sentinel) to correlate suspicious patterns.
+
+Task 7: Hardening Cheat Sheet
+This task provides a quick reference for AD security configurations.
+
+Key Configurations Summary
+Security Control	Configuration Path	Recommended Setting
+LM Hash Storage	Local Policies → Security Options	Disabled
+SMB Signing	Local Policies → Security Options	Required
+LDAP Signing	Domain Controller Settings	Required
+Minimum Password	Account Policies → Password Policy	12+ characters
+Password Complexity	Account Policies → Password Policy	Enabled
+Account Lockout	Account Policies → Account Lockout	5 attempts, 30 min
+Defense-in-Depth Strategy
+Authentication Layer: MFA, strong passwords, Kerberos over NTLM
+
+Authorization Layer: RBAC, least privilege, time-limited access
+
+Monitoring Layer: Centralized logging, anomaly detection, SIEM integration
+
+Recovery Layer: Regular backups, documented incident response, tested disaster recovery
+
+Key Takeaways
+Effective AD hardening requires multiple defensive layers. The attack surface reduces significantly when you:
+
+Eliminate legacy protocols (LM/NTLMv1)
+
+Enforce cryptographic signing
+
+Implement tiered administration
+
+Apply vendor security baselines
+
+Monitor continuously for anomalies
+
+AD security isn't a one-time configuration—it demands ongoing audits, updates, and alignment with evolving threat landscapes.
+
+Additional Resources
+Microsoft AD Security Best Practices - https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/best-practices-for-securing-active-directory
+
+BloodHound for AD Attack Path Analysis - https://github.com/SpecterOps/BloodHound-Legacy
+
+Purple Knight - AD Security Assessment - https://www.semperis.com/purple-knight/
+
+
