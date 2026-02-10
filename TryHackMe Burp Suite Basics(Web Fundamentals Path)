@@ -1,0 +1,186 @@
+Task 1 Introduction:
+Burp Suite Basics from TryHackMe covers the following topics:
+What Burp Suite is
+An overview of the framework's utilities
+Installing Burp Suite personally
+Configuring and navigating Burp Suite
+
+Task 2 What is Burp Suite?
+Burp Suite is a Java-based framework that seeks to provide penetration testing tools for web applications. It is the industry standard for conducting hands-on web security testing. Burp Suite is also commonly used when analyzing mobile applications, as the same features that make it so appealing for web application testing translate nearly flawlessly to testing the APIs (Application Programming Interfaces) that power the majority of mobile applications. At its most fundamental level, Burp is capable of recording and manipulating all traffic between the attacker and a webserver; this is the framework's primary functionality. After capturing requests, we have the option to send these individuals to various other Burp Suite framework components.
+Burp Suite Professional:
+Version of Burp Suite Community with no restrictions.
+A vulnerability analyzer which is automated
+A brute forcer
+Archiving initiatives for future use and report production
+Access to install new extensions to improve functionality
+Access to the Burp Suite Partner
+
+Burp Suite Enterprise:
+Continuous Scanning.
+Automated vulnerability scanner.
+Enterprise sits on a server and constantly and target web apps for web vulnerabilities.
+
+Answer the questions below:
+Which Edition of Burp Suite will we be using in this module?
+
+Ans: Burp Suite Community
+2. Which edition of Burp Suite runs on a server and provides constant scanning for target web apps?
+Ans: Burp Suite Enterprise
+3. Burp Suite is frequently use when attacking web applications and ______ applications.
+Ans: Mobile
+Task 3 Features of Burp Community:
+Proxy: Intercepts and modifies requests and responses when communicating with web applications.
+Burp Suite ProxyRepeater: permits capturing, modifying, and resending the same request multiple times.
+Burp Suite RepeaterIntruder: enables flooding an endpoint with requests. This is utilized to pass a collection of values by means of an input.
+The intruder serves as:
+To login forms, PIN forms, and other similar forms, brute-force attacks are launched.
+A dictionary attack on login forms with suspected XSS or SQL injection-vulnerable fields.
+Testing and attacking the web application's bandwidth limiting.
+
+Decoder: lists common encoding methods, used for payload construction, session hijacking.
+Burp Suite DecoderComparer: enables the comparison of two data items at a word or byte level, accepts large chunks of data.
+Burp Suite ComparerSequencer: is used when evaluating the randomness of tokens such as session cookie values or other ostensibly randomly generated data, it is important to take into account the correlation between the token and the data.
+Answer the questions below:
+Which Burp Suite feature allows us to intercept requests between ourselves and the target?
+
+Ans: Proxy
+2. Which Burp tool would we use if we wanted to brute force a login form?
+Ans: Intruder
+Task 4 Installation:
+You can download and follow the instructions from these pages if you don't have it pre-packaged with Kali-Linux in your system.
+https://portswigger.net/burp/releases/professional-community-2023-5-3?requestededition=community&requestedplatform=
+Task 5 Dashboard:
+The dashboard is split into 4 parts.
+Burp Suite DashboardTasks menu: define background tasks. Pro Version allows us to create on demand scans.
+Event Logs: outlines what Burp is doing and any connections it has established.
+Issue Activity: exclusive to Burp Pro, a listing of all vulnerabilities discovered by the automated scan. Ranking vulnerabilities by severity.
+Advisory Section: provides information regarding discovered vulnerabilities and suggested recommendations.
+
+Task 6 Navigation:
+You can navigate using the top menu bars:
+
+if you have multiple tabs separately you can use it by separately using "Detach" under the "Window" in the application.
+
+Or you can use the keyboard shortcuts:
+
+ctrl + shift + D → Switch to dashboard
+ctrl + shift + T → Switch to Target tab
+ctrl + shift + P → Switch to Proxy tab
+ctrl + shift + I → Switch to Intruder tab
+ctrl + shift + R → Switch to Repeater tab
+Task 7 Options:
+In addition to the top menu panel, the User Options tab contains global settings. The settings in this tab apply globally.
+The Project options pane contains project-specific configurations.
+
+There are four major subsections on the User Options tab:
+Connections: enables us to control how Burp connects to targets, for example by configuring a proxy for Burp Suite's connection.
+TLS: allows us to enable and disable various TLS options and provides a location to upload client certificates if a web application requires us to use a certificate for connections.
+Display: allows to change the font, scale and theme for the framework.
+Misc: contains a wide range of keybinding table (HotKeys) settings, such as a way to see and modify keyboard shortcuts.
+
+Project Options tab:
+Connections: consists of the same options as the User Options tab. For example, Hostname Resolution (allowing you to map domains to IPs through a Burp Site) and "Out-Of-Scope Requests" parameters allow you to determine if Burp sends requests to anything besides the targets.
+HTTP: Specifies how Burp should manage different aspects of the HTTP protocol, such as whether or not it redirects and how to handle uncommon response codes.
+TLS: enables overriding application-wide TLS options and displaying a list of publicly available server certificates for visited websites.
+Sessions: Contains options for handling sessions and specifies how Burp gets, stores, and uses session cookies it receives.
+Misc: same as the User tab options.
+Answer the questions below:
+Change the Burp Suite theme to dark mode
+
+Ans: No answer needed.
+2. In which Project options sub-tab can you find reference to a "Cookie jar"?
+Ans: Sessions
+3. In which User options sub-tab can you change the Burp Suite update behaviour?
+Ans: Misc
+4. What is the name of the section within the User options "Misc" sub-tab which allows you to change the Burp Suite keybindings?
+Ans: HotKeys
+5. If we have uploaded Client-Side TLS certificates in the User options tab, can we override these on a per-project basis (Aye/Nay)?
+Ans: Aye
+Task 8 Proxy Introduction to Burp Proxy:
+Proxy is the most foundational and indispensable Burp Suite utility. It permits us to record requests and responses between the yourself and our objective. These can be modified or sent to different tools for additional processing before being permitted to reach their intended destination.
+If we make a request to https://tryhackme.com via Burp Proxy, the request we make will be intercepted and will not be sent to the Tryhackme servers till we explicitly authorize it. We have the option to do exactly the same with the server's response, although this is not enabled by default. This capability to intercept requests enables us to exert total control over our web traffic.
+Burp provides us with a wealth of important information and supplementary reading. This data is worth perusing; however, the bulk of it is provided after a request has been captured.
+With the proxy enabled, a request to the TryHackMe site was made. At this juncture, the browser submitting the request will freeze, as well as the request will show up in the Proxy tab, as shown in the image above. Then, we have the option to forward or reject the request (possibly after modifying it). It is also possible to transmit a request to one of the other Burp sections, copy it as a cURL command, and save it to a file, among many other options.
+When the intercept is disabled, Burp Suite will continue to log requests made through the proxy. This can be extremely useful for analyzing past requests, even if they were not initially captured.
+Burp will also capture and monitor WebSocket communication, which is again extremely useful when analyzing a web application.
+Visit the "HTTP history" and "WebSockets history" subtabs to view the logs.
+In the Proxy Settings, which can be accessed by selecting the "Proxy Settings" button, there are also proxy-specific settings.
+It is highly recommended that you familiarize yourself with these settings, as they provide a great deal of control over the proxy's operation.
+By default, the proxy will not intercept server responses unless we instruct it to do so explicitly on a per-request basis. We can override the default configuration by selecting "Intercept responses based on the following rules" and selecting one or more rules. The "Or Request Was Intercepted" rule is useful for capturing responses to all queries that the proxy intercepted.
+"And URL Is in target scope" is an additional excellent default rule.
+You can create your own guidelines for the majority of the Proxy options too so experimenting in this area will serve you extremely well!
+The "Match and Replace" section within this subtab is also particularly useful, as it allows you to conduct regexes on both inbound and outbound requests. You can, for instance, automatically alter your user agent to simulate an alternate web browser during outgoing requests or delete all cookies set during incoming requests. You are permitted to establish your own guidelines here.
+Answer the questions below:
+Which button would we choose to send an intercepted request to the target in Burp Proxy?
+Ans: Forward
+[Research] What is the default keybind for this?
+Note: Assume you are using Windows or Linux (i.e. swap Cmd for Ctrl).
+Ans: Ctrl + F
+Task 9 Proxy - Connecting through the proxy
+There are two methods for proxying our traffic with Burp Suite.
+We could utilize the built-in browser.
+Commonly, we may set the local browser to redirect our traffic through Burp.
+
+By default, the Burp Proxy opens a web interface at 127.0.0.1:8080. As the term "proxy" implies, we have to route all of the browser's activity by the specified port beforehand so we can begin capturing it with Burp. We can accomplish this by modifying the browser's options or, more frequently, by installing the FoxyProxy extension for Firefox. FoxyProxy lets us store proxy profiles, allowing us to transition to the "Burp Suite" profile within a few clicks and disable the proxy server just as quickly.
+FoxyProxy is available in two versions: Basic and Standard. Both versions enable us to modify our proxy options on the fly, but FoxyProxy Standards gives us significantly more control over the traffic that is routed through the proxy. This is a more complex proxy than the one provided by FoxyProxy Basic.
+The standard version is more than sufficient for our needs for this learning module.
+Answer the questions below:
+Read through the options in the right-click menu.
+There is one particularly useful option that allows you to intercept and modify the response to your request.
+What is this option?
+Note: The option is in a dropdown sub-menu.
+Ans: Response to this request
+[Bonus Question - Optional] Try installing FoxyProxy standard and have a look at the pattern matching features.
+No answer needed.
+Task 10: Proxy - Proxying HTTPS
+If you have chosen to use a system of your own rather than an AttackBox, you will encounter the following issue: For instance, when visiting https://www.google.com, the following message error will appear: Software Prevents Firefox from Connecting to This Site Securely. Refer to the task description on TryHackMe in order to resolve this issue.
+Answer the questions below
+If you are not using the AttackBox, configure Firefox (or your browser of choice) to accept the Portswigger CA certificate for TLS communication through the Burp Proxy.
+No Answer needed.
+Task 11: Proxy- The Burp suite browser
+Burp Suite also comes with a Chromium browser that has been set up to use the proxy, eliminating the need for the changes mentioned in the previous tasks.
+We can launch the Burp Browser by clicking "Open Browser" in the proxy tab:
+Now, a Chromium window will appear. All requests made will be routed through the proxy.
+If you face the below error, follow the steps:
+This is because you are running it as the root user( Attackbox).
+Go to Settings -> Burp Browser -> Allow Burp's broswer to run without a sandbox.
+Once the checkbox is enabled, you can try opening the browser again.
+Task 12: Proxy- Scoping and Targeting
+Burp's ability to capture all of the traffic we receive can become extremely annoying. When it logs everything, including traffic to non-targeted sites, it confuses logs that we may later want to send to clients. Letting Burp gather everything can rapidly become a major nuisance. The solution to this scoping.
+Defining the project's scope enables us to specify what is proxied and logged. We can restrict Burp Suite to test only the web application(s) we specify. Switching to the "Target" pane, right-clicking the target from the list on the left, and selecting "Add To Scope" is the simplest method. The majority of the time, we should select "yes" when Burp asks if we want to cease logging anything that isn't in scope.
+We have just elected to disable tracking for out-of-scope traffic statistics, but the proxy server will continue to intercept all traffic. To disable this, select "And URL Is in target scope" in the Intercept Clients Requests section of the Proxy Options sub-tab.
+With this choice selected, the proxy may completely neglect anything not included in the scope, significantly clearing up the traffic entering Burp.
+Answer the questions below
+Add http://MACHINE_IP/ to your scope and change the Proxy settings to only intercept traffic to in-scope targets.
+See the difference between the amount of traffic getting caught by the proxy before and after limiting the scope.
+No Answer needed.
+Task 13: Proxy- Site Map and Issue Definitions
+Handling of the scope might be a particularly useful feature of Burp's Target tab, but it is certainly not the only one.
+You'll find three sub-tabs under the Target:
+Site map: The site map enables us to outline the targeted applications in an ordered structure. Every page we visit will appear in this section, allowing you to automatically generate a map of the site for the target website merely by navigating the web application. Burp Pro would also enable us to automatically spider the targets however, we can still use Burp Community to collect data while performing our initial enumeration steps.
+When we visit a page, all API endpoints from which the page retrieves data while loading will be displayed on the Site map. This can be particularly useful for mapping out an API.
+Scope Settings: We have previously encountered the Scope Settings window, which allows us to control Burp's objective project scope.
+Issue Definitions: While we do not have access to the Burp Suite vulnerability scanner in Burp Community, we do have access to a catalog of the vulnerabilities it searches for. If we need citations for a report or assistance describing a vulnerability, we can refer to the Issue Definitions section for a comprehensive list of web vulnerabilities, replete with descriptions and references.
+Answer the questions below
+Take a look around the site on http://MACHINE_IP/ -- we will be using this a lot throughout the module. Visit every page linked to from the homepage, then check your sitemap -- one endpoint should stand out as being very unusual!
+Visit this in your browser (or use the "Response" section of the site map entry for that endpoint)
+What is the flag you receive?
+Ans: THM{NmNlZTliNGE1MWU1ZTQzMzgzNmFiNWVk}
+Look through the Issue Definitions list.
+What is the typical severity of a Vulnerable JavaScript dependency?
+Ans: Low
+Task 14: Example Attack
+Having looked at how to set up and configure our proxy, let's go through a simplified real-world example.
+In a realistic web application penetration test, we would evaluate this for a variety of vulnerabilities, including Cross-Site Scripting (or XSS). If you have not encountered XSS before, you can think of it as injecting an executable client-side script (typically written in Javascript) into a web page. There are numerous types of XSS; the type we use here is known as "Reflected" XSS because it only affects the user making the web request.
+Answer the question below:
+Try typing: <script>alert("Succ3ssful XSS")</script>, into the "Contact Email" field. You should find that there is a client-side filter in place which prevents you from adding any special characters that aren't allowed in email addresses:
+No Answer needed.
+Fortunately for us, client-side filters are absurdly easy to bypass. There are a variety of ways we could disable the script or just prevent it from loading in the first place.
+Let's focus on simply bypassing the filter for now.
+First, make sure that your Burp Proxy is active and that the intercept is on.
+Now, enter some legitimate data into the support form. For example: "pentester@example.thm" as an email address, and "Test Attack" as a query.
+Submit the form - the request should be intercepted by the proxy.
+With the request captured in the proxy, we can now change the email field to be our very simple payload from above: <script>alert("Succ3ssful XSS")</script>. After pasting in the payload, we need to select it, then URL encode it with the Ctrl + U shortcut to make it safe to send.
+Finally, press the "Forward" button to send the request.
+You should find that you get an alert box from the site indicating a successful XSS attack!
+Congratulations, you bypassed the filter!
