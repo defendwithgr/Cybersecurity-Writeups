@@ -1,0 +1,197 @@
+Task1: Introduction
+
+This session will cover how to make use of Repeater to change and randomly resend captured requests, as well as some of the cool features of this incredible tool.
+
+Answer the questions below
+
+Deploy the machine (and the AttackBox if you are not using your own attack VM), and let’s get started!
+
+Note: If you are not using the AttackBox and want to connect to this machine without the VPN, you can do so using this link once the machine has fully loaded and an IP address is displayed: https://LAB_WEB_URL.p.thmlabs.com.
+
+No answer needed
+
+Task 2: What is Repeater?
+
+Burp Suite Repeater enables us to arbitrarily construct and/or relay captured requests to a target. We are able to take a request captured by the Proxy, modify it, and then forward the same request as many times as we desire.
+
+The Repeater interface can be separated into six major sections, that can be understood using the accompanying explanations and the diagram with annotations that follows.
+Request Catalog: Located in the upper-left corner of the screen, this displays a catalog of Repeater requests. Every single freshly sent request is going to be listed here. Repeater can manage multiple requests simultaneously.
+Request Control: Just beneath the request display, there are settings for the current request. These controls allow you to transmit a request, cancel a lengthy request, and browse through the request’s history.
+Request and Response view: The request and response view predominates the tab’s left side. In the Request view, you can modify the request and then send it. The response will be displayed in the Response view.
+Layout options: Over the requested/response section on the right side, you’ll find options for customizing the request and response views’ layout. You can also opt for displaying them above/below each other (vertical layout) or in distinct tabs (combined view). The standard layout is typically side-by-side (horizontal).
+Inspector: Located on the right part of the window, the Inspector enables the analysis and editing of requests. This is an approach that is more user-friendly than working with the basic editor. Additional information regarding the Inspector will be presented in a subsequent task.
+Target: Located above the inspector is the intended target. This indicates the IP address or domain to which your inquiries are being sent. This area will be automatically populated when queries are sent to Repeater from other Burp Suite sections.
+
+Press enter or click to view image in full size
+
+Task 3: Basic Usage
+
+Now that we are acquainted with the Repeater interface, let’s investigate its applications.
+Creating requests manually is possible, but it is more common to capture a request with the Proxy tool and subsequently transmit it to Repeater to continue editing and resending.
+When a request is captured by the Proxy, it is simple to forward it to Repeater. This can be accomplished by right-clicking the message you want to send and selecting “Send to Repeater,” or by pressing Ctrl + R.
+After going to the Repeater menu, you will observe that the sent request is now available for use:
+Utilize these stages in your workflow to utilize Repeater’s capabilities effectively.
+Press enter or click to view image in full size
+
+The target and Inspector sections are now also displaying data, but we have not yet received a response. Upon clicking the “Send” icon, the Response section populates immediately:
+
+Press enter or click to view image in full size
+
+If we wish to modify any aspect of the request, we simply enter it in the Request window and select “Send” again; this will cause the Response on the right to be updated. Changing the “Connection” field from close to open, for instance, produces a response “Connection” field in the value keep-alive:
+
+Press enter or click to view image in full size
+
+Additionally, we could use the history icons to the right of the button that says Send to navigate through our modification history.
+
+Answer the question below:
+
+Capture a request to http://MACHINE_IP in the Proxy and send it to Repeater.
+
+Practice modifying and re-sending the request numerous times.
+
+No Answer needed.
+
+Task 4: Views
+
+Repeater offers multiple methods for displaying the responses to our queries, ranging from viewing hexadecimal output to displaying a fully made version of the webpage.
+For each of these response display options, easily locate the four view icons located above the response button:
+
+
+Pretty: This is the standard aesthetic option. It attempts to format the original response for enhanced readability.
+Raw: This option displays the server’s response without any formatting modifications.
+Hex: This section displays the response byte-by-byte, which is especially useful when working with binary files.
+Render: The render view illustrates how the page would appear in a web browser. Despite the fact that this may not be particularly beneficial given Repeater’s emphasis on source code, it is still an intriguing feature.
+In most cases, the “Pretty” option is sufficient. Nonetheless, understanding the utility of the remaining three alternatives remains valuable.
+Next to these view options is a button labeled “Show non-printable characters” (\n). This button facilitates displaying of characters that may not be visible in either the Pretty or Raw views.
+
+The \r\n characters, which represent the characters for carriage return and newline, serve a role in the interpretation of HTTP headers.
+While not essential for the majority of duties, this option can be extremely useful in certain circumstances.
+
+Answer the questions below
+
+Experiment with the available view options.
+
+No Answer needed
+
+Which view option displays the response in the same format as your browser would?
+
+Ans: Render
+
+Task 5: Inspector
+
+Inspector is a supplementary utility within the Repeater interface that enhances both the request and response fields’ functionality. If you have a firm understanding of how to read and modify HTTP requests, you may not utilize Inspector frequently.
+
+However, it provides a useful method for organizing requests and responses in a more visually enticing manner. In addition, it is extremely useful for experimentation, as it enables you to observe how changes made with Inspector impact the related raw versions.
+
+Inspector can be utilized in both the Proxy and Repeater contexts. It displays on the far right side of the window and provides a comprehensive list of request and response components.
+
+
+Among these parts, the request-related sections are frequently modifiable. This adaptability permits you to add, modify, and remove products. In the “Request Attributes” section, for instance, elements pertaining to the request’s location, method, and protocol can be modified. This includes modifying the intended resource, transitioning from the GET method to another HTTP method, or converting from HTTP/1 to HTTP/2.
+
+
+Other sections available for review and revision include:
+
+Query Parameters: refer to data sent to the server via the URL. A URL such as https://admin.tryhackme.com/?redirect=false contains the query parameter “redirect” with the value “false.”
+Body parameters: Similar to Query Parameters, but only applicable to POST requests. Any data sent in a POST request is displayed, allowing parameter modification prior to resending.
+Request Cookies: This section contains a catalog of configurable cookies sent with each request.
+Request parameters: This provides visibility, access, and the ability to modify request parameters. When analyzing how a webserver reacts to unanticipated header changes, modifying headers can be especially illuminating.
+Request Headers: This section displays the directives returned by the server in response to a request. These cannot be altered, as they are determined by the server, unlike request headers. This section becomes visible only after a request has been sent and a response has been received.
+While these components are typically presented as text within request and response sections, Inspector’s tabular format improves their readability. Using Inspector to experiment with header additions, deletions, and adjustments provides an insightful understanding of how these modifications affect the corresponding raw version.
+
+Become a member
+Answer the question below:
+
+Get comfortable with Inspector and practice adding/removing items from the various request sections.
+
+No Answer needed
+
+Task 6: Practical Example
+
+When dealing with duties that involve sending a repetitive request multiple times, often with minor modifications between iterations, Repeater is most effective. This tool is particularly useful for activities such as manually testing for SQL injection vulnerabilities, attempting to circumvent a web application firewall’s filter, and modifying form submission parameters.
+
+Let’s get started begin with a simple example: modifying the header information of a request aimed at a target using Repeater.
+First, submit the request from Repeater; the response tab will then display the HTML source code of the requested page.
+
+
+Try investigating this material using one of the additional viewing options, such as “Renderered,” for a different perspective.
+
+
+You can enhance the request using the Inspector tool (or manually, if you prefer) by adding a new header with the name “FlagAuthorised” and the value “True.” For example:
+
+
+Send the request. What is the flag you receive?
+
+Ans: THM{Yzg2MWI2ZDhlYzdlNGFiZTUzZTIzMzVi}
+
+This exercise enables you to play around with modifying request headers within the context of a Repeater request.
+
+Task7: Practical Challenge
+
+In the earlier assignment, Repeater was used to demonstrate how headers and requests are sent. This example should clearly demonstrate the functionality of Repeater. Let’s now proceed to a straightforward obstacle.
+
+Make sure your proxy is disabled, and then proceed to http://MACHINE_IP/products/. Explore by clicking on numerous “See More” links while you’re there.
+
+When you click on these URLs, you may observe that you are redirected to a numeric endpoint, such as /products/3.
+
+
+This endpoint requires validation to ensure that the specified number exists and is a valid integer. However, consider the situation if this validation is not effectively implemented.
+
+Answer the question below:
+
+Capture a request to one of the numeric products endpoints in the Proxy, then forward it to Repeater.
+
+No answer needed
+
+See if you can get the server to error out with a “500 Internal Server Error” code by changing the number at the end of the request to extreme inputs.
+
+What is the flag you receive when you cause a 500 error in the endpoint?
+
+
+
+Ans: THM{N2MzMzFhMtAlMmZiYjA2YWQ4M2ZmMzhl}
+
+Task8: Extra mile SQLi with Repeater
+
+This mission includes an additional obstacle that presents a more complex application of the Burp Repeater. You may proceed directly to the final inquiry and approach it blindly if you have experience performing manual SQL Injection. Alternatively, a detailed instruction guide can be found below.
+
+Start by capturing a request to http://MACHINE_IP/about/2 using Burp Proxy. Once you have captured the request, transmit it to Repeater using Ctrl + R or by right-clicking and selecting “Send to Repeater.”
+
+
+Having prepared the request, the initial stage is to verify the vulnerability. Adding a single quotation (‘) after “2” in the request’s route typically results in a server warning if a basic SQL injection is feasible. You can accomplish this using either Inspector or by explicitly modifying the request path:
+
+
+Upon sending this modified demand, you should get a “500 Internal Server Error” response, which indicates a successful query manipulation.
+Line 40 of the server’s answer contains information that warrants further investigation.
+
+
+The response reveals the query we sought to execute:
+Despite being unintentional on the part of the server, this error message proves to be extraordinarily informative and greatly facilitates our task. It provides vital information for exploiting the weakness:
+
+The target database table’s designation is “people.” The query selects the following five columns: firstName, lastName, pfpLink, role, and bio. We are able to discern their position on the page, which assists us in carefully arranging our replies.
+
+This information enables us to bypass certain stages requiring column numbering and table naming. Nonetheless, the target column’s name must be determined.
+
+Given our knowledge of the table name and row count, we can use a union query to derive the column names based on the “people” table by accessing the “columns” table in the default “information_schema” data.
+
+This query performs a union and selects the name of the target column, then inserts four null columns to prevent errors. Please note that we have changed the ID value from 2 to 0. This modification assures that the initial query will not return any valid results, allowing our injected query to return the first row.
+
+Upon examining the response, we will notice that the first name of the column (“id”) is included in the page title:
+Despite having effectively extracted the first column name, a new difficulty arises. The page only displays one matching item, despite the fact that we need access to all of them.
+
+Our SQL Injection technique can be used to organize the results. While still obtaining only one result at a time, the “group_concat()” function can be used to combine all column names into a single output:
+
+UNION ALL SELECT group_concat(column_name),null,null,null,null,null FROM information_schema.columns; WHILE table_name = “people”
+
+
+
+Having determined that there are eight columns in the table (id, firstName, lastName, pfpLink, role, shortRole, bio, and notes), it is plausible that our target column is “notes.”
+
+We are finally prepared to get the flag to this file, armed with all of the
+
+UNION ALL SELECT notes,null,null,null,null FROM people WHERE id = 1
+
+
+
+What is the flag?
+
+Ans: THM{ZGE3OTUyZGMyMzkwNjJmZjg3Mzk1NjJh}
